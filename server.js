@@ -6,6 +6,9 @@ const port = process.env.PORT;
 
 app.use(express.json());
 
+app.use("/api/client", require("./routes/clientRoute"));
+app.use("/api/retailer", require("./routes/retailerRoute"));
+
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
