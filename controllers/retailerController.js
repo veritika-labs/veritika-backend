@@ -30,6 +30,18 @@ const createWallet = asyncHandler(async (req, res, next) => {
   }
 });
 
+const retrieveWallets = asyncHandler(async (req, res, next) => {
+  try {
+    const walletsList = await intasendService.retrieveWallets();
+    res.status(200).json(walletsList);
+  } catch (error) {
+    res.status(500).json({ error: "Error retrieving wallets" });
+  }
+});
+
+
+
 module.exports = {
   createWallet,
+  retrieveWallets,
 };

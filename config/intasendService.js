@@ -21,6 +21,15 @@ class IntaSendService {
     }
   }
 
+  async retrieveWallets() {
+    try {
+      const walletsList = await this.wallets.list();
+      return walletsList;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async makePayment({ name, email, amount, phoneNumber, apiRef }) {
     try {
       const response = await this.collection.mpesaStkPush({
