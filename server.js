@@ -8,7 +8,7 @@ const IntaSendService = require("./config/intasendService");
 
 const intaSendService = new IntaSendService(
   process.env.PUBLICKEY,
-  process.env.PIRVATEKEY
+  process.env.PRIVATEKEY
 );
 
 connectDb();
@@ -26,7 +26,7 @@ app.listen(port, () => {
 // dummy wallet
 intaSendService
   .createWallet({
-    label: "Test Wallet",
+    label: "Unique Test Wallet",
     wallet_type: "WORKING",
     currency: "KES",
     can_disburse: false,
