@@ -54,10 +54,17 @@ const fundWallet = asyncHandler(async (req, res, next) => {
       walletId: walletId,
     });
 
-    if (fundResponse){
-      return res.status(200).json(fundResponse);
-    }
+    // if (fundResponse){
+    //   return res.status(200).json(fundResponse);
+    // }
+
+    sleep(20)
+    .then(() => {
+      res.status(200).json(fundResponse);
+    })
+
 });
+
 
 const retrieveTransactions = asyncHandler(async (req, res, next) => {
   const { walletId } = req.body; // Extract wallet ID from request parameters
