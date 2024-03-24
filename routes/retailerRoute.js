@@ -7,10 +7,11 @@ const {
   fundWallet,
   retrieveTransactions,
 } = require("../controllers/retailerController");
+const validateToken = require("../middleware/validateToken");
 
 router
-  .post("/create", createWallet)
-  .get("/retrieve", retrieveWallets)
+  .post("/create", validateToken, createWallet)
+  .get("/wallets", retrieveWallets)
   .post("/fund", fundWallet)
   .get("/transactions", retrieveTransactions);
 

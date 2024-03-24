@@ -1,10 +1,8 @@
 const express = require("express");
 const router = express.Router();
 
-const { test, getClients } = require("../controllers/clientController");
-const validateToken = require("../middleware/validateToken");
+const { signup, signin } = require("../controllers/clientController");
 
-router.post("/test", validateToken, test).get("/get", getClients);
-
+router.post("/signup", signup).post("/signin", signin);
 
 module.exports = router;

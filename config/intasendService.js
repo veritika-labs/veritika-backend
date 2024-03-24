@@ -1,4 +1,5 @@
 const IntaSend = require("intasend-node");
+const Wallet = require("../models/walletSchema");
 const asyncHandler = require("express-async-handler");
 
 class IntaSendService {
@@ -8,17 +9,17 @@ class IntaSendService {
     this.collection = this.intaSend.collection();
   }
 
-  async createWallet({ label, wallet_type, currency, can_disburse }) {
+  async createWallet({ label, currency }) {
     try {
       const response = await this.wallets.create({
         label: label,
-        wallet_type: wallet_type,
+        wallet_type: "WORKING",
         currency: currency,
-        can_disburse: can_disburse,
+        can_disburse: true,
       });
       return response;
     } catch (error) {
-      throw error;
+      throw new Error("Failed to create wallet");
     }
   }
 
@@ -27,49 +28,73 @@ class IntaSendService {
       const walletsList = await this.wallets.list();
       return walletsList;
     } catch (error) {
-      throw error;
+      throw new Error("Failed to retrieve wallets");
     }
   }
 
-  async fundWallet({
+  async mpesaToWallet({
     firstName,
     lastName,
     email,
     amount,
     phoneNumber,
-    apiRef,
     walletId,
   }) {
-    const response = await this.wallets.fundMPesa({
-      first_name: firstName,
-      last_name: lastName,
-      email: email,
-      amount: amount,
-      phone_number: phoneNumber,
-      host: "http://localhost:5000",
-      api_ref: apiRef,
-      wallet_id: walletId,
-    });
-    if (response) {
+    try {
+      const response = await this.wallets.fundMPesa({
+        first_name: firstName,
+        last_name: lastName,
+        email: email,
+        amount: amount,
+        phone_number: phoneNumber,
+        host: "http://localhost:5000",
+        api_ref: "test",
+        wallet_id: walletId,
+      });
       return response;
-    } else {
-      res.status(400);
-      throw new Error(error);
+    } catch (error) {
+      throw new Error("Failed to fund wallet from M-Pesa");
     }
   }
 
-  async makePayment({ name, email, amount, phoneNumber, apiRef }) {
+  async walletToMpesa(
+    walletId,
+    recipientName,
+    recipientPhone,
+    amount,
+    narrative
+  ) {
+    try {
+      const resp = await this.intaSend.payouts().mpesa({
+        currency: "KES",
+        transactions: [
+          {
+            name: recipientName,
+            account: recipientPhone,
+            amount: amount,
+            narrative: narrative,
+          },
+        ],
+        wallet_id: walletId,
+      });
+      return "Wallet-to-MPesa transfer successful";
+    } catch (error) {
+      throw new Error("Failed to transfer funds to MPesa");
+    }
+  }
+
+  async makePayment({ name, email, amount, phoneNumber }) {
     try {
       const response = await this.collection.mpesaStkPush({
         name: name,
         email: email,
         amount: amount,
         phone_number: phoneNumber,
-        api_ref: apiRef,
+        api_ref: "test",
       });
       return response;
     } catch (error) {
-      throw error;
+      throw new Error("Failed to make payment");
     }
   }
 
@@ -78,16 +103,23 @@ class IntaSendService {
       const response = await this.collection.status(invoiceId);
       return response;
     } catch (error) {
-      throw error;
+      throw new Error("Failed to check payment status");
     }
   }
 
-  async retrieveTransactions(walletId) {
+  async checkWalletTransactions(userId) {
     try {
-      const response = await this.wallets.transactions(walletId);
+      const wallet = await Wallet.findOne({ user_id: userId });
+      if (!wallet) {
+        throw new Error("User does not have a wallet");
+      }
+      const response = await this.wallets.transactions(wallet.wallet_id);
+      if (!response) {
+        throw new Error("No wallet transactions found");
+      }
       return response;
     } catch (error) {
-      throw error;
+      throw new Error("Failed to check wallet transactions");
     }
   }
 }

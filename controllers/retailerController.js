@@ -44,19 +44,19 @@ const fundWallet = asyncHandler(async (req, res, next) => {
   const { firstName, lastName, email, amount, phoneNumber, apiRef, walletId } =
     req.body;
 
+    if(!firstName || !lastName || !email || !amount || !phoneNumber || !apiRef || !walletId){
+      res.status(400);
+      throw new Error("Please fill all the fields")
+    }
+
     const fundResponse = await intasendService.fundWallet({
       firstName: firstName,
       lastName: lastName,
       email: email,
       amount: amount,
       phoneNumber: phoneNumber,
-      apiRef: apiRef,
       walletId: walletId,
     });
-
-    // if (fundResponse){
-    //   return res.status(200).json(fundResponse);
-    // }
 
     sleep(20)
     .then(() => {
