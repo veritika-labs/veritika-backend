@@ -3,11 +3,10 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/userSchema");
 
-// Function for user sign up
 const signup = asyncHandler(async (req, res, next) => {
-  const { name, email, password } = req.body;
+  const { first_name, last_name, phone_number, email, password } = req.body;
 
-  if (!name || !email || !password) {
+  if (!first_name || !last_name || !email || !password || !phone_number) {
     res.status(400);
     throw new Error("Please fill all the fields");
   }
@@ -21,8 +20,10 @@ const signup = asyncHandler(async (req, res, next) => {
   const hashedPassword = await bcrypt.hash(password, 10);
 
   await User.create({
-    name,
+    first_name,
+    last_name,
     email,
+    phone_number,
     password: hashedPassword,
   });
 
@@ -51,16 +52,19 @@ const signin = asyncHandler(async (req, res, next) => {
     throw new Error("Invalid email or password");
   }
 
-  const token = generateToken(user._id, user.name, user.email);
+  const token = generateToken(user._id, user.first_name, user.last_name, user.email, user.role, user.phone_number);
 
   res.status(200).json({ token });
 });
 
-function generateToken(userId, name, email) {
+function generateToken(userId, first_name, last_name, email, role, phone_number) {
   const payload = {
     userId: userId,
-    name: name,
+    first_name: first_name,
+    last_name: last_name,
     email: email,
+    role: role,
+    phone_number: phone_number,
   };
   const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1h" });
 

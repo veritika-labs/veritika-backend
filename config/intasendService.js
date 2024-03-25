@@ -1,6 +1,4 @@
 const IntaSend = require("intasend-node");
-const Wallet = require("../models/walletSchema");
-const asyncHandler = require("express-async-handler");
 
 class IntaSendService {
   constructor(publishableKey, secretKey, testMode = true) {
@@ -19,6 +17,7 @@ class IntaSendService {
       });
       return response;
     } catch (error) {
+      console.error("Error creating wallet:", error);
       throw new Error("Failed to create wallet");
     }
   }
@@ -107,19 +106,15 @@ class IntaSendService {
     }
   }
 
-  async checkWalletTransactions(userId) {
+  async checkWalletTransactions(wallet_id) {
     try {
-      const wallet = await Wallet.findOne({ user_id: userId });
-      if (!wallet) {
-        throw new Error("User does not have a wallet");
-      }
-      const response = await this.wallets.transactions(wallet.wallet_id);
+      const response = await this.wallets.transactions(wallet_id);
       if (!response) {
         throw new Error("No wallet transactions found");
       }
       return response;
     } catch (error) {
-      throw new Error("Failed to check wallet transactions");
+      throw new Error(error);
     }
   }
 }

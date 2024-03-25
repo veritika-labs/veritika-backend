@@ -11,16 +11,17 @@ const walletSchema = new mongoose.Schema(
       type: String,
       required: [true, "Label is required"],
     },
-    wallet_id:{
+    wallet_id: {
       type: String,
       required: [true, "Wallet id is required"],
     },
     can_disburse: {
       type: Boolean,
       required: [true, "Can disburse is required"],
+      default: true,
     },
     currency: {
-      type: Number,
+      type: String,
       required: [true, "Currency is required"],
     },
     wallet_type: {
