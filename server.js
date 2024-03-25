@@ -11,34 +11,18 @@ const intaSendService = new IntaSendService(
   process.env.PRIVATEKEY
 );
 
-connectDb();
-
 app.use(express.json());
 
 app.use("/api/client", require("./routes/clientRoute"));
 app.use("/api/retailer", require("./routes/retailerRoute"));
 app.use(errorHandler);
 
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-});
-
-// dummy wallet
-intaSendService
-  .createWallet({
-    label: "Unique Test Wallet",
-    wallet_type: "WORKING",
-    currency: "KES",
-    can_disburse: false,
+connectDb()
+  .then(() => {
+    app.listen(port, () => {
+      console.log(`Server is running on port ${port}`);
+    });
   })
-  .then((response) => {
-    console.log("Intasend service is up and running");
-  })
-  .catch((error) => {
-    // Convert the Buffer to a string
-    const errorMessage = error.toString();
-    console.error(
-      "There was an error with the Intasend service:",
-      errorMessage
-    );
+  .catch((err) => {
+    console.error("Failed to connect to the database:", err);
   });
