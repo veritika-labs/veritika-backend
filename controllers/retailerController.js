@@ -91,14 +91,14 @@ const createWallet = asyncHandler(async (req, res, next) => {
 
 const retrieveUserWallets = asyncHandler(async (req, res, next) => {
   const userId = req.user.userId;
-  console.log(userId)
-    const userWallets = await Wallet.find({ user_id: userId });
+  console.log(userId);
+  const userWallets = await Wallet.find({ user_id: userId });
 
-    if (!userWallets || userWallets.length === 0) {
-      res.status(404);
-      throw new Error("User has no wallets");
-    }
-    res.status(200).json({ userWallets });
+  if (!userWallets || userWallets.length === 0) {
+    res.status(404);
+    throw new Error("User has no wallets");
+  }
+  res.status(200).json({ userWallets });
 });
 
 const retrieveWallets = asyncHandler(async (req, res, next) => {
@@ -111,14 +111,13 @@ const retrieveWallets = asyncHandler(async (req, res, next) => {
 });
 
 const fundWallet = asyncHandler(async (req, res, next) => {
-  const { amount, phoneNumber, walletId } =
-    req.body;
+  const { amount, phoneNumber, walletId } = req.body;
 
-    const { first_name, last_name, email} = req.user;
+  const { first_name, last_name, email } = req.user;
 
   if (
-    !firstName ||
-    !lastName ||
+    !first_name ||
+    !last_name ||
     !email ||
     !amount ||
     !phoneNumber ||
