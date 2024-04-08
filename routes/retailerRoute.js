@@ -8,6 +8,7 @@ const {
   retrieveWallets,
   fundWallet,
   retrieveTransactions,
+  checkInvoicestatus,
 } = require("../controllers/retailerController");
 const {
   signin,
@@ -15,12 +16,12 @@ const {
 const validateToken = require("../middleware/validateToken");
 
 router
-  .post("/create", validateToken, createWallet)
+  .post("/wallet/create", validateToken, createWallet)
   .post("/signup", signup)
   .post("/signin", signin)
   .get("/wallets", validateToken, retrieveUserWallets)
   .get("/wallets/all", validateToken, retrieveWallets)
-  .post("/fund", fundWallet)
-  .get("/transactions", retrieveTransactions);
+  .post("/wallet/fund", validateToken, fundWallet)
+  .get("/transactions", retrieveTransactions)
 
 module.exports = router;

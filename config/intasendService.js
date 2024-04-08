@@ -56,6 +56,26 @@ class IntaSendService {
     }
   }
 
+  async walletToWallet({
+    sourceWalletId,
+    destinationWalletId,
+    amount,
+    narrative,
+  }) {
+    try {
+      const resp = await wallets.intraTransfer(
+        sourceWalletId,
+        destinationWalletId,
+        amount,
+        narrative
+      );
+      return resp;
+    } catch (err) {
+      console.error(`Intra Transfer error:`, err);
+      throw new Error("Failed to perform wallet to wallet transfer");
+    }
+  }
+
   async walletToMpesa(
     walletId,
     recipientName,
