@@ -211,9 +211,21 @@ const checkInvoicestatus = asyncHandler(async (req, res, next) => {
   }
 });
 
+const currentUser = asyncHandler(async (req, res, next) => {
+  const { email } = req.user;
+  const user = await User.findOne({ email });
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+  res.status(200).json(user);
+});
+
+
 module.exports = {
   signup,
   createWallet,
+  currentUser,
   retrieveUserWallets,
   retrieveWallets,
   fundWallet,
