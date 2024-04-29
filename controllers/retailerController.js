@@ -228,6 +228,11 @@ const walletToMpesa = asyncHandler(async (req, res, next) => {
     throw new Error("Please fill in all the fields");
   }
 
+  if(amount < 10) {
+    res.status(400);
+    throw new Error("Minimum amount is Ksh 10");
+  }
+
   const user = await User.findOne({ email });
 
   const wallet = await Wallet.findOne({
@@ -251,8 +256,7 @@ const walletToMpesa = asyncHandler(async (req, res, next) => {
     });
     res.status(200).json(transactions);
   } catch (error) {
-    res.status(500);
-    throw new Error("An error occurred while processing your request.");
+      res.status(500).json({ error: error });
   }
 });
 

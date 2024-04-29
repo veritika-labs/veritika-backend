@@ -18,7 +18,9 @@ class IntaSendService {
       });
       return response;
     } catch (error) {
-      throw new Error("Failed to create wallet");
+      const errorObject = JSON.parse(error);
+      const errorMessage = errorObject.errors[0].detail;
+      throw errorMessage;
     }
   }
 
@@ -27,7 +29,9 @@ class IntaSendService {
       const walletsList = await this.wallets.list();
       return walletsList;
     } catch (error) {
-      throw new Error("Failed to retrieve wallets");
+      const errorObject = JSON.parse(error);
+      const errorMessage = errorObject.errors[0].detail;
+      throw errorMessage;
     }
   }
 
@@ -52,7 +56,9 @@ class IntaSendService {
       });
       return response;
     } catch (error) {
-      throw new Error("Failed to fund wallet from M-Pesa");
+      const errorObject = JSON.parse(error);
+      const errorMessage = errorObject.errors[0].detail;
+      throw errorMessage;
     }
   }
 
@@ -70,8 +76,10 @@ class IntaSendService {
         narrative
       );
       return resp;
-    } catch (err) {
-      throw new Error(err);
+    } catch (error) {
+      const errorObject = JSON.parse(error);
+      const errorMessage = errorObject.errors[0].detail;
+      throw errorMessage;
     }
   }
 
@@ -97,8 +105,10 @@ class IntaSendService {
         wallet_id: walletId,
       });
       return resp;
-    } catch (err) {
-      throw err;
+    } catch (error) {
+      const errorObject = JSON.parse(error);
+      const errorMessage = errorObject.errors[0].detail;
+      throw errorMessage;
     }
   }
 
@@ -113,7 +123,9 @@ class IntaSendService {
       });
       return response;
     } catch (error) {
-      throw error;
+      const errorObject = JSON.parse(error);
+      const errorMessage = errorObject.errors[0].detail;
+      throw errorMessage;
     }
   }
 
@@ -122,7 +134,9 @@ class IntaSendService {
       const response = await this.collection.status(invoiceId);
       return response;
     } catch (error) {
-      throw new Error("Failed to check payment status");
+      const errorObject = JSON.parse(error);
+      const errorMessage = errorObject.errors[0].detail;
+      throw errorMessage;
     }
   }
 
@@ -134,7 +148,9 @@ class IntaSendService {
       }
       return response;
     } catch (error) {
-      throw new Error(error);
+      const errorObject = JSON.parse(error);
+      const errorMessage = errorObject.errors[0].detail;
+      throw errorMessage;
     }
   }
 }
