@@ -64,7 +64,7 @@ class IntaSendService {
     narrative,
   }) {
     try {
-      const resp = await wallets.intraTransfer(
+      const resp = await this.wallets.intraTransfer(
         sourceWalletId,
         destinationWalletId,
         amount,
@@ -72,19 +72,18 @@ class IntaSendService {
       );
       return resp;
     } catch (err) {
-      console.error(`Intra Transfer error:`, err);
-      throw new Error("Failed to perform wallet to wallet transfer");
+      throw new Error(err);
     }
   }
 
-  async walletToMpesa(
+  async walletToMpesa({
     walletId,
     recipientName,
     recipientPhone,
     amount,
     currency,
     narrative
-  ) {
+  }) {
     try {
       const resp = await this.payouts.mpesa({
         currency: currency,
@@ -115,7 +114,7 @@ class IntaSendService {
       });
       return response;
     } catch (error) {
-      throw new Error("Failed to make payment");
+      throw error;
     }
   }
 
