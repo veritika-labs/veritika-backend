@@ -5,6 +5,7 @@ class IntaSendService {
     this.intaSend = new IntaSend(publishableKey, secretKey, testMode);
     this.wallets = this.intaSend.wallets();
     this.collection = this.intaSend.collection();
+    this.payouts = this.intaSend.payouts();
   }
 
   async createWallet({ label, currency }) {
@@ -81,11 +82,12 @@ class IntaSendService {
     recipientName,
     recipientPhone,
     amount,
+    currency,
     narrative
   ) {
     try {
-      const resp = await this.intaSend.payouts().mpesa({
-        currency: "KES",
+      const resp = await this.payouts.mpesa({
+        currency: currency,
         transactions: [
           {
             name: recipientName,
@@ -96,9 +98,9 @@ class IntaSendService {
         ],
         wallet_id: walletId,
       });
-      return "Wallet-to-MPesa transfer successful";
-    } catch (error) {
-      throw new Error("Failed to transfer funds to MPesa");
+      return resp;
+    } catch (err) {
+      throw err;
     }
   }
 
