@@ -148,8 +148,6 @@ const fundWallet = asyncHandler(async (req, res, next) => {
       const response = await intasendService.checkPaymentStatus(invoiceId);
       const status = response.invoice.state;
 
-      console.log("Status: ", status);
-
       if (status !== "PENDING" && status !== "PROCESSING") {
         if (status === "COMPLETE") {
           const walletsList = await intasendService.retrieveWallets();
@@ -218,7 +216,6 @@ const retrieveTransactions = asyncHandler(async (req, res, next) => {
   const transactions = await intasendService.checkWalletTransactions(
     wallet.wallet_id
   );
-  console.log(wallet.wallet_id);
   res.status(200).json(transactions);
 });
 
@@ -252,10 +249,8 @@ const walletToMpesa = asyncHandler(async (req, res, next) => {
       currency: currency,
       narrative: narrative,
     });
-    console.log(wallet.wallet_id);
     res.status(200).json(transactions);
   } catch (error) {
-    console.error("Error in walletToMpesa:", error);
     res.status(500);
     throw new Error("An error occurred while processing your request.");
   }

@@ -18,7 +18,6 @@ class IntaSendService {
       });
       return response;
     } catch (error) {
-      console.error("Error creating wallet:", error);
       throw new Error("Failed to create wallet");
     }
   }
