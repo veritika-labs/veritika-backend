@@ -4,6 +4,12 @@ const dotenv = require("dotenv").config();
 const app = express();
 const port = process.env.PORT;
 const connectDb = require("./config/database");
+const IntaSendService = require("./config/intasendService");
+
+const intaSendService = new IntaSendService(
+  process.env.PUBLICKEY,
+  process.env.PRIVATEKEY
+);
 
 app.use(express.json());
 
