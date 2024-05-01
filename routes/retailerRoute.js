@@ -10,6 +10,7 @@ const {
   retrieveTransactions,
   currentUser,
   walletToMpesa,
+  walletToWallet,
 } = require("../controllers/retailerController");
 const {
   signin,
@@ -22,9 +23,9 @@ router
   .post("/signin", signin)
   .get("/user", validateToken, currentUser)
   .get("/wallets", validateToken, retrieveUserWallets)
-  .get("/wallets/all", validateToken, retrieveWallets)
   .post("/wallet/fund", validateToken, fundWallet)
   .post("/wallet/mpesa", validateToken, walletToMpesa)
+  .post("/wallet/wallet", validateToken, walletToWallet)
   .post("/transactions", validateToken, retrieveTransactions);
 
 module.exports = router;

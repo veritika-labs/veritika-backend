@@ -74,18 +74,13 @@ const createWallet = asyncHandler(async (req, res, next) => {
 
     const newWallet = await Wallet.create({
       user_id: user._id,
-      label: walletResponse.label,
       wallet_id: walletResponse.wallet_id,
       currency: currency,
-      wallet_type: walletResponse.wallet_type,
-      current_balance: walletResponse.current_balance,
-      can_disburse: walletResponse.can_disburse,
-      available_balance: walletResponse.available_balance,
     });
 
-    res.status(201).json(newWallet);
+    res.status(201).json(walletResponse);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -97,16 +92,26 @@ const retrieveUserWallets = asyncHandler(async (req, res, next) => {
     res.status(404);
     throw new Error("User has no wallets");
   }
-  res.status(200).json({ userWallets });
-});
 
-const retrieveWallets = asyncHandler(async (req, res, next) => {
-  try {
-    const walletsList = await intasendService.retrieveWallets();
-    res.status(200).json(walletsList);
-  } catch (error) {
-    res.status(500).json({ error: "Error retrieving wallets" });
+  const walletIds = userWallets.map((wallet) => wallet.wallet_id);
+  const walletsList = await intasendService.retrieveWallets();
+
+  const userWalletDetails = [];
+  walletIds.forEach((walletId) => {
+    const walletDetail = walletsList.results.find(
+      (wallet) => wallet.wallet_id === walletId
+    );
+    if (walletDetail) {
+      userWalletDetails.push(walletDetail);
+    }
+  });
+
+  if (userWalletDetails.length === 0) {
+    res.status(404);
+    throw new Error("Could not find details of the user's wallets");
   }
+
+  res.status(200).json({ userWalletDetails });
 });
 
 const fundWallet = asyncHandler(async (req, res, next) => {
@@ -136,14 +141,12 @@ const fundWallet = asyncHandler(async (req, res, next) => {
 
     const invoiceId = fundResponse.invoice.invoice_id;
 
-    const timeout = 40 * 1000;
+    const timeout = 50 * 1000;
     const startTime = Date.now();
 
     const checkStatus = async () => {
       const response = await intasendService.checkPaymentStatus(invoiceId);
       const status = response.invoice.state;
-
-      console.log("Status: ", status);
 
       if (status !== "PENDING" && status !== "PROCESSING") {
         if (status === "COMPLETE") {
@@ -213,7 +216,6 @@ const retrieveTransactions = asyncHandler(async (req, res, next) => {
   const transactions = await intasendService.checkWalletTransactions(
     wallet.wallet_id
   );
-  console.log(wallet.wallet_id);
   res.status(200).json(transactions);
 });
 
@@ -224,6 +226,11 @@ const walletToMpesa = asyncHandler(async (req, res, next) => {
   if (!recipientName || !recipientPhone || !amount || !narrative || !currency) {
     res.status(400);
     throw new Error("Please fill in all the fields");
+  }
+
+  if(amount < 10) {
+    res.status(400);
+    throw new Error("Minimum amount is Ksh 10");
   }
 
   const user = await User.findOne({ email });
@@ -247,10 +254,41 @@ const walletToMpesa = asyncHandler(async (req, res, next) => {
       currency: currency,
       narrative: narrative,
     });
-    console.log(wallet.wallet_id);
     res.status(200).json(transactions);
   } catch (error) {
-    console.error("Error in walletToMpesa:", error.msg);
+      res.status(500).json({ error: error });
+  }
+});
+
+const walletToWallet = asyncHandler(async (req, res, next) => {
+  const { currency, amount, destination_wallet_id, narrative } = req.body;
+  const email = req.user.email;
+  if (!destination_wallet_id || !amount || !narrative || !currency) {
+    res.status(400);
+    throw new Error("Please fill in all the fields");
+  }
+
+  const user = await User.findOne({ email });
+
+  const wallet = await Wallet.findOne({
+    user_id: user._id,
+    currency,
+  });
+
+  if (!wallet) {
+    res.status(404);
+    throw new Error("Wallet not found");
+  }
+
+  try {
+    const transactions = await intasendService.walletToWallet({
+      sourceWalletId: wallet.wallet_id,
+      destinationWalletId: destination_wallet_id,
+      amount: amount,
+      narrative: narrative,
+    });
+    res.status(200).json(transactions);
+  } catch (error) {
     res.status(500);
     throw new Error("An error occurred while processing your request.");
   }
@@ -271,8 +309,8 @@ module.exports = {
   createWallet,
   currentUser,
   retrieveUserWallets,
-  retrieveWallets,
   fundWallet,
   walletToMpesa,
+  walletToWallet,
   retrieveTransactions,
 };

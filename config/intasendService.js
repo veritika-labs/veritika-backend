@@ -18,8 +18,9 @@ class IntaSendService {
       });
       return response;
     } catch (error) {
-      console.error("Error creating wallet:", error);
-      throw new Error("Failed to create wallet");
+      const errorObject = JSON.parse(error);
+      const errorMessage = errorObject.errors[0].detail;
+      throw errorMessage;
     }
   }
 
@@ -28,7 +29,9 @@ class IntaSendService {
       const walletsList = await this.wallets.list();
       return walletsList;
     } catch (error) {
-      throw new Error("Failed to retrieve wallets");
+      const errorObject = JSON.parse(error);
+      const errorMessage = errorObject.errors[0].detail;
+      throw errorMessage;
     }
   }
 
@@ -53,7 +56,9 @@ class IntaSendService {
       });
       return response;
     } catch (error) {
-      throw new Error("Failed to fund wallet from M-Pesa");
+      const errorObject = JSON.parse(error);
+      const errorMessage = errorObject.errors[0].detail;
+      throw errorMessage;
     }
   }
 
@@ -64,27 +69,28 @@ class IntaSendService {
     narrative,
   }) {
     try {
-      const resp = await wallets.intraTransfer(
+      const resp = await this.wallets.intraTransfer(
         sourceWalletId,
         destinationWalletId,
         amount,
         narrative
       );
       return resp;
-    } catch (err) {
-      console.error(`Intra Transfer error:`, err);
-      throw new Error("Failed to perform wallet to wallet transfer");
+    } catch (error) {
+      const errorObject = JSON.parse(error);
+      const errorMessage = errorObject.errors[0].detail;
+      throw errorMessage;
     }
   }
 
-  async walletToMpesa(
+  async walletToMpesa({
     walletId,
     recipientName,
     recipientPhone,
     amount,
     currency,
     narrative
-  ) {
+  }) {
     try {
       const resp = await this.payouts.mpesa({
         currency: currency,
@@ -99,8 +105,10 @@ class IntaSendService {
         wallet_id: walletId,
       });
       return resp;
-    } catch (err) {
-      throw err;
+    } catch (error) {
+      const errorObject = JSON.parse(error);
+      const errorMessage = errorObject.errors[0].detail;
+      throw errorMessage;
     }
   }
 
@@ -115,7 +123,9 @@ class IntaSendService {
       });
       return response;
     } catch (error) {
-      throw new Error("Failed to make payment");
+      const errorObject = JSON.parse(error);
+      const errorMessage = errorObject.errors[0].detail;
+      throw errorMessage;
     }
   }
 
@@ -124,7 +134,9 @@ class IntaSendService {
       const response = await this.collection.status(invoiceId);
       return response;
     } catch (error) {
-      throw new Error("Failed to check payment status");
+      const errorObject = JSON.parse(error);
+      const errorMessage = errorObject.errors[0].detail;
+      throw errorMessage;
     }
   }
 
@@ -136,7 +148,9 @@ class IntaSendService {
       }
       return response;
     } catch (error) {
-      throw new Error(error);
+      const errorObject = JSON.parse(error);
+      const errorMessage = errorObject.errors[0].detail;
+      throw errorMessage;
     }
   }
 }
