@@ -89,8 +89,7 @@ const retrieveUserWallets = asyncHandler(async (req, res, next) => {
   const userWallets = await Wallet.find({ user_id: userId });
 
   if (!userWallets || userWallets.length === 0) {
-    res.status(404);
-    throw new Error("User has no wallets");
+    return res.status(200).json({ userWalletDetails: [] });
   }
 
   const walletIds = userWallets.map((wallet) => wallet.wallet_id);
@@ -107,12 +106,12 @@ const retrieveUserWallets = asyncHandler(async (req, res, next) => {
   });
 
   if (userWalletDetails.length === 0) {
-    res.status(404);
-    throw new Error("Could not find details of the user's wallets");
+    return res.status(200).json({ userWalletDetails: [] });
   }
 
   res.status(200).json({ userWalletDetails });
 });
+
 
 const fundWallet = asyncHandler(async (req, res, next) => {
   const { amount, phoneNumber, walletId } = req.body;
